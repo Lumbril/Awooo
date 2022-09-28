@@ -1,5 +1,8 @@
 import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
 
 if os.getenv("LEVEL") == "PROD":
     print('RUN PROD MODE')
