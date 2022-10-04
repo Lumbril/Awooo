@@ -78,6 +78,16 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
+SWAGGER_SETTINGS = {
+   'SECURITY_DEFINITIONS': {
+      'oauth2': {
+            'type': 'http, Bearer',
+            'name': 'Authorization',
+            'in': 'header'
+      }
+   }
+}
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

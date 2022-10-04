@@ -4,7 +4,7 @@ from rest_framework import status
 
 class Successful(Response):
 
-    def __init__(self, data={'successful': True}, status=None):
+    def __init__(self, data={'successful': True}, status=status.HTTP_200_OK):
         super().__init__(data=data, status=status)
 
 
