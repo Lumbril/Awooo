@@ -11,6 +11,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
     @swagger_auto_schema(
+        tags=['account'],
         responses={
             status.HTTP_200_OK: TokenObtainPairResponseSerializer,
         },
@@ -33,6 +34,7 @@ class CustomTokenRefreshView(TokenRefreshView):
     serializer_class = CustomTokenRefreshSerializer
 
     @swagger_auto_schema(
+        tags=['account'],
         responses={
             status.HTTP_200_OK: TokenRefreshResponseSerializer,
         },
