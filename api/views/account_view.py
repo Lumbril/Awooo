@@ -1,6 +1,7 @@
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
@@ -50,4 +51,17 @@ class RecoveryView(ViewSet):
         operation_id='Запрос на восстановление'
     )
     def verify(self, request):
+        return Successful()
+
+
+class UserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        tags=['account'],
+        operation_id='Информации об аккаунте'
+    )
+    def get(self, request):
+        user = request.user
+
         return Successful()

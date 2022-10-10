@@ -80,12 +80,15 @@ SIMPLE_JWT = {
 
 SWAGGER_SETTINGS = {
    'SECURITY_DEFINITIONS': {
-      'oauth2': {
-            'type': 'http, Bearer',
+        'Basic': {
+           'type': 'basic'
+        },
+        'Bearer': {
+            'type': 'apiKey',
             'name': 'Authorization',
             'in': 'header'
-      }
-   }
+        }
+    }
 }
 
 TEMPLATES = [
