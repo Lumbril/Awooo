@@ -54,14 +54,24 @@ class RecoveryView(ViewSet):
         return Successful()
 
 
-class UserView(APIView):
+class UserView(ViewSet):
     permission_classes = [IsAuthenticated]
 
+    @action(detail=False, methods=['get'], url_path='me')
     @swagger_auto_schema(
         tags=['account'],
         operation_id='Информации об аккаунте'
     )
-    def get(self, request):
+    def me(self, request):
         user = request.user
 
+        return Successful()
+
+    @action(detail=False, methods=['post'], url_path='changePassword')
+    @swagger_auto_schema(
+        tags=['account'],
+        request_body=ChangePasswordSerializer(),
+        operation_id='Смена пароля'
+    )
+    def set_password(self, request):
         return Successful()

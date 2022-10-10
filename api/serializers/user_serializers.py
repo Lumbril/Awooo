@@ -41,3 +41,11 @@ class RecoverySerializer(serializers.Serializer):
     class Meta:
         model = UserModel
         fields = ('email', 'code',)
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    password = serializers.CharField()
+
+    class Meta:
+        model = UserModel
+        fields = ('password', )
