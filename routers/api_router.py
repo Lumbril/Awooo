@@ -5,6 +5,7 @@ from api import views as views_api
 
 
 router = DefaultRouter(trailing_slash=False)
+router.register('account', views_api.RecoveryView, basename='recovery')
 
 additional_urlpatterns = [
     path('account/registration', views_api.AccountView.as_view(), name='registration'),

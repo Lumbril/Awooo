@@ -1,9 +1,11 @@
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
 
-from api.serializers.user_serializers import UserRegistrationRequestSerializer, UserRegistrationResponseSerializer
-from packs import Successful
+from api.serializers import *
+from packs import Successful, Error
 
 
 class AccountView(APIView):
@@ -17,10 +19,35 @@ class AccountView(APIView):
         operation_id='Регистрация'
     )
     def post(self, request):
-        serializer = UserRegistrationRequestSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        try:
+            serializer = UserRegistrationRequestSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
 
-        validated_data = serializer.validated_data
-        serializer.create(validated_data)
+            validated_data = serializer.validated_data
+            user = serializer.create(validated_data)
 
+            serializer = UserRegistrationResponseSerializer(user, partial=True)
+
+            return Successful(serializer.data)
+        except:
+            return Error(data={'error': 'Пользователь с таким email существует'})
+
+
+class RecoveryView(ViewSet):
+    @action(detail=False, methods=['post'], url_path='recovery')
+    @swagger_auto_schema(
+        tags=['account'],
+        request_body=RecoveryRequestCodeSerializer(),
+        operation_id='Запрос на получения кода для восстановления'
+    )
+    def post(self, request):
+        return Successful()
+
+    @action(detail=False, methods=['post'], url_path='recovery/verify')
+    @swagger_auto_schema(
+        tags=['account'],
+        request_body=RecoverySerializer(),
+        operation_id='Запрос на восстановление'
+    )
+    def verify(self, request):
         return Successful()

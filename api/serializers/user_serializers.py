@@ -24,3 +24,20 @@ class UserRegistrationResponseSerializer(serializers.Serializer):
     class Meta:
         model = UserModel
         fields = ('id', 'email')
+
+
+class RecoveryRequestCodeSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    class Meta:
+        model = UserModel
+        fields = ('email',)
+
+
+class RecoverySerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.IntegerField()
+
+    class Meta:
+        model = UserModel
+        fields = ('email', 'code',)
