@@ -2,26 +2,25 @@ version: '3.8'
 
 services:
   web:
-    build: .
-    command: sh -c 'python3 manage.py migrate &&
-              gunicorn Awooo.wsgi:application --bind 0.0.0.0:8000'
-    volumes:
-      - .:/usr/src/app
+    build: ./src
+    restart: always
     ports:
       - 8000:8000
+    volumes:
+      - .:/usr/src/app
     env_file:
-      - ./.env
+      - ./src/.env
     depends_on:
       - db
 
   db:
     image: postgres:13.0-alpine
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - ./persistentdata/db:/var/lib/postgresql/data/
     ports:
       - 5432:5432
     env_file:
-      - ./.env
+      - ./src/.env
 
 volumes:
   postgres_data:
