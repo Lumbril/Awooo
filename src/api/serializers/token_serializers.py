@@ -11,8 +11,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class TokenObtainPairResponseSerializer(serializers.Serializer):
-    access = serializers.CharField()
-    refresh = serializers.CharField()
+    jwtToken = serializers.SerializerMethodField()
+    refreshToken = serializers.CharField()
 
     def create(self, validated_data):
         raise NotImplementedError()

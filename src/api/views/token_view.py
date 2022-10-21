@@ -20,6 +20,9 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         try:
             data = super().post(request, *args, **kwargs)
 
+            data.data['jwtToken'] = data.data.pop('access')
+            data.data['refreshToken'] = data.data.pop('refresh')
+
             return data
         except:
             return Error(data={
