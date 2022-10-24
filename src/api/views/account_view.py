@@ -31,7 +31,17 @@ class AccountView(APIView):
 
             return Successful(serializer.data)
         except:
-            return Error(data={'error': 'Пользователь с таким email существует'})
+            error = serializer.errors
+
+            if 'email' in error.keys():
+                error = error['email'][0]
+
+                if error == 'Значения поля должны быть уникальны.':
+                    error = 'Пользователь с таким email существует'
+
+                return Error(data={'message': error, 'exit': False})
+
+            return Error()
 
 
 class RecoveryView(ViewSet):

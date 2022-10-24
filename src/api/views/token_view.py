@@ -24,11 +24,10 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             data.data['refreshToken'] = data.data.pop('refresh')
 
             return data
-        except:
+        except Exception as e:
             return Error(data={
-                            'errors': [
-                                'Incorrect password.',
-                                ]
+                            'message': 'Данные некорректны',
+                            'exit': False,
                             })
 
 
@@ -37,6 +36,7 @@ class CustomTokenRefreshView(TokenRefreshView):
 
     @swagger_auto_schema(
         tags=['account'],
+        request_body=CustomTokenRefreshSerializer,
         responses={
             status.HTTP_200_OK: TokenRefreshResponseSerializer,
         },
