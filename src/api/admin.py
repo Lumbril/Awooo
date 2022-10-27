@@ -10,4 +10,4 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Code)
 class CodeAdmin(admin.ModelAdmin):
-    list_display = ['email', 'code', 'number_of_attempts']
+    list_display = ['email', 'code', 'type', 'number_of_attempts']

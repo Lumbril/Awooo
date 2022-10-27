@@ -30,6 +30,7 @@ class AccountView(ViewSet):
             user_code = Code()
             user_code.email = validated_data['email']
             user_code.code = generate_code()
+            user_code.type = Code.Type.REGISTRATION
             user_code.save()
 
             user = serializer.create(validated_data)
@@ -71,6 +72,11 @@ class AccountView(ViewSet):
         serializer = ConfirmCodeRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        try:
+            pass
+        except:
+            return Error(data={'message': 'Почта введена неверно', 'exit': False})
+
         validated_data = serializer.validated_data
         email = validated_data['email']
         code_req = validated_data['code']
@@ -82,10 +88,13 @@ class AccountView(ViewSet):
 
         user = user.first()
 
-        code = Code.objects.filter(email=email)
-
-        if not code.exists() or user.is_active:
+        if user.is_active:
             return Error(data={'message': 'Пользователь уже активен', 'exit': False})
+
+        code = Code.objects.filter(email=email, type=Code.Type.REGISTRATION)
+
+        if not code.exists():
+            return Error(data={'message': 'Код больше не действителен, запросите новый', 'exit': False})
 
         code = code.first()
 
@@ -105,6 +114,57 @@ class AccountView(ViewSet):
         serializer = UserRegistrationResponseSerializer(instance=user)
 
         return Successful(serializer.data)
+
+    @action(detail=False, methods=['post'], url_path='activation_code')
+    @swagger_auto_schema(
+        tags=['account'],
+        request_body=RecoveryRequestCodeSerializer,
+        operation_id='Запросить новый код на подтверждение аккаунта'
+    )
+    def create_new_code(self, request):
+        serializer = RecoveryRequestCodeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            pass
+        except:
+            return Error(data={'message': 'Почта введена неверно', 'exit': False})
+
+        validated_data = serializer.validated_data
+        email = validated_data['email']
+
+        user = UserModel.objects.filter(email=email)
+
+        if not user.exists():
+            return Error(data={'message': 'Такого пользователя не существует', 'exit': False})
+
+        user = user.first()
+
+        if user.is_active:
+            return Error(data={'message': 'Пользователь уже активен', 'exit': False})
+
+        code = Code.objects.filter(email=email, type=Code.Type.REGISTRATION)
+
+        if code.exists():
+            code = code.first()
+            code.delete()
+
+        code = Code()
+        code.email = email
+        code.code = generate_code()
+        code.type = Code.Type.REGISTRATION
+        code.save()
+
+        email_message = EmailMessage(
+            'Активация аккаунта',
+            code.code,
+            settings.EMAIL_HOST_USER,
+            [user.email],
+        )
+
+        EmailSendThread(email_message).start()
+
+        return Successful()
 
 
 class RecoveryView(ViewSet):

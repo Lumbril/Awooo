@@ -2,6 +2,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinLengthValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class CustomUserManager(BaseUserManager):
@@ -47,9 +48,14 @@ class User(AbstractUser):
 
 
 class Code(models.Model):
+    class Type(models.TextChoices):
+        REGISTRATION = 'REGISTRATION', _('Для регистрации')
+        CHANGE_PASSWORD = 'CHANGE_PASSWORD', _('Для смены пароля')
+
     email = models.EmailField(blank=False, null=False, verbose_name="Почта")
     code = models.CharField(validators=[MinLengthValidator(6)], max_length=6,
                             blank=False, null=False, verbose_name="Код")
+    type = models.CharField(max_length=32, null=True, choices=Type.choices, verbose_name='Тип кода')
     number_of_attempts = models.PositiveIntegerField(default=0, verbose_name="Использованные попытки")
 
     class Meta:
