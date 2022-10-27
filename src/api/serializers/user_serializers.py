@@ -26,6 +26,11 @@ class UserRegistrationResponseSerializer(serializers.Serializer):
         fields = ('id', 'email')
 
 
+class ConfirmCodeRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.CharField()
+
+
 class RecoveryRequestCodeSerializer(serializers.Serializer):
     email = serializers.EmailField()
 

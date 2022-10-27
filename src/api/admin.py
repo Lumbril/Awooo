@@ -1,8 +1,13 @@
 from django.contrib import admin
 
-from api.models import User
+from api.models import User, Code
 
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['email', 'is_active']
+
+
+@admin.register(Code)
+class CodeAdmin(admin.ModelAdmin):
+    list_display = ['email', 'code', 'number_of_attempts']

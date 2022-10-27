@@ -1,3 +1,4 @@
+from django.core.mail import EmailMessage
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import action
@@ -5,31 +6,45 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
+from Awooo import settings
+from api.models import Code
 from api.serializers import *
-from packs import Successful, Error
+from packs import Successful, Error, EmailSendThread
+from packs.services.code_generator import generate_code
 
 
-class AccountView(APIView):
-
+class AccountView(ViewSet):
+    @action(detail=False, methods=['post'], url_path='registration')
     @swagger_auto_schema(
         tags=['account'],
         request_body=UserRegistrationRequestSerializer,
-        responses={
-            status.HTTP_200_OK: UserRegistrationResponseSerializer,
-        },
         operation_id='Регистрация'
     )
-    def post(self, request):
+    def registration(self, request):
         try:
             serializer = UserRegistrationRequestSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
 
             validated_data = serializer.validated_data
-            user = serializer.create(validated_data)
 
+            user_code = Code()
+            user_code.email = validated_data['email']
+            user_code.code = generate_code()
+            user_code.save()
+
+            user = serializer.create(validated_data)
             serializer = UserRegistrationResponseSerializer(user, partial=True)
 
-            return Successful(serializer.data)
+            email_message = EmailMessage(
+                'Активация аккаунта',
+                user_code.code,
+                settings.EMAIL_HOST_USER,
+                [user.email],
+            )
+
+            EmailSendThread(email_message).start()
+
+            return Successful()
         except:
             error = serializer.errors
 
@@ -42,6 +57,54 @@ class AccountView(APIView):
                 return Error(data={'message': error, 'exit': False})
 
             return Error()
+
+    @action(detail=False, methods=['post'], url_path='confirm')
+    @swagger_auto_schema(
+        tags=['account'],
+        request_body=ConfirmCodeRequestSerializer,
+        responses={
+            status.HTTP_200_OK: UserRegistrationResponseSerializer,
+        },
+        operation_id='Подтверждение аккаунта'
+    )
+    def confirm(self, request):
+        serializer = ConfirmCodeRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        validated_data = serializer.validated_data
+        email = validated_data['email']
+        code_req = validated_data['code']
+
+        user = UserModel.objects.filter(email=email)
+
+        if not user.exists():
+            return Error(data={'message': 'Пользователь не найден', 'exit': False})
+
+        user = user.first()
+
+        code = Code.objects.filter(email=email)
+
+        if not code.exists() or user.is_active:
+            return Error(data={'message': 'Пользователь уже активен', 'exit': False})
+
+        code = code.first()
+
+        if code.code != code_req:
+            code.number_of_attempts += 1
+            code.save()
+
+            if code.number_of_attempts == 5:
+                code.delete()
+
+            return Error(data={'message': 'Код неверный', 'exit': False})
+
+        user.is_active = True
+        user.save()
+        code.delete()
+
+        serializer = UserRegistrationResponseSerializer(instance=user)
+
+        return Successful(serializer.data)
 
 
 class RecoveryView(ViewSet):

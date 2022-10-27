@@ -22,6 +22,22 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
             return data
         except Exception as e:
+            user = UserModel.objects.filter(email=request.data['email'])
+
+            if not user.exists():
+                return Error(data={
+                    'message': 'Пользователь не найден',
+                    'exit': False,
+                })
+
+            user = user.first()
+
+            if not user.is_active:
+                Error(data={
+                    'message': 'Пользователь не подтвердил почту',
+                    'exit': False,
+                })
+
             return Error(data={
                             'message': 'Данные некорректны',
                             'exit': False,
