@@ -37,9 +37,15 @@ class RecoveryRequestCodeSerializer(serializers.Serializer):
     email = serializers.EmailField(validators=[EmailValidator])
 
 
+class RecoveryCodeSerializer(serializers.Serializer):
+    email = serializers.EmailField(validators=[EmailValidator])
+    code = serializers.CharField()
+
+
 class RecoverySerializer(serializers.Serializer):
     email = serializers.EmailField(validators=[EmailValidator])
-    code = serializers.IntegerField()
+    password = serializers.CharField(write_only=True)
+    code = serializers.CharField()
 
 
 class ChangePasswordSerializer(serializers.Serializer):
