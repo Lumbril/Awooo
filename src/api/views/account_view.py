@@ -52,7 +52,8 @@ class AccountView(ViewSet):
                 error = error['email'][0]
 
                 if error == 'Значения поля должны быть уникальны.':
-                    error = 'Пользователь с таким email существует'
+                    return Error(data={'message': 'Пользователь с таким email существует',
+                                       'exit': False, 'exist': True})
 
                 return Error(data={'message': error, 'exit': False})
 
