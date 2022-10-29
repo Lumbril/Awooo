@@ -15,5 +15,5 @@ RUN pip3 install -r requirements.txt
 COPY . ./src
 
 CMD gunicorn --chdir ./src Awooo.wsgi:application --bind 0.0.0.0:8000
-CMD python3 app/src/manage.py migrate
-CMD python3 app/src/manage.py collectstatic
+CMD python3 src/manage.py migrate
+CMD python3 src/manage.py collectstatic
