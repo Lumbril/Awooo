@@ -340,4 +340,23 @@ class UserView(ViewSet):
         operation_id='Смена пароля'
     )
     def set_password(self, request):
+        user = request.user
+        serializer = ChangePasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        validated_data = serializer.validated_data
+        old_pass = validated_data['old_password']
+        new_pass = validated_data['new_password']
+
+        try:
+            pass
+        except Exception as e:
+            return Error(data={'message': e, 'exit': False})
+
+        if not user.check_password(old_pass):
+            return Error(data={'message': 'Старый пароль введен неправильно', 'exit': False})
+
+        user.set_password(new_pass)
+        user.save()
+
         return Successful()
