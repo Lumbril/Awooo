@@ -20,7 +20,7 @@ class Breed(models.Model):
 class Dog(models.Model):
     account = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, verbose_name='Аккаунт владельца')
     name = models.CharField(max_length=128, verbose_name='Кличка собаки')
-    avatar = models.ImageField(upload_to='media/', null=True, blank=True, verbose_name='Аватар')
+    avatar = models.ImageField(upload_to='images/', null=True, blank=True, verbose_name='Аватар')
     hasAvatar = models.BooleanField(verbose_name='Есть ли аватар')
     data_update_avatar = models.DateTimeField(auto_now_add=True, verbose_name='Дата обновления аватара')
     breed = models.ForeignKey(Breed, null=True, on_delete=models.SET_NULL, verbose_name='Порода')

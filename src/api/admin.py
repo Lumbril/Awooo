@@ -29,5 +29,5 @@ class DogAdmin(admin.ModelAdmin):
 
     def preview(self, obj):
         return format_html(
-            '<a href="/{0}" target="_blank">'
-            '<img src="/{0}" height="100"></a>', obj.get_avatar()) if obj.get_avatar() else '-'
+            '<a href="/media/{0}" target="_blank">'
+            '<img src="/media/{0}" height="100"></a>', obj.get_avatar()) if obj.get_avatar() else '-'
