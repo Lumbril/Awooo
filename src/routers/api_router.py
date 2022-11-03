@@ -8,6 +8,7 @@ router = DefaultRouter(trailing_slash=False)
 router.register('account', views_api.RecoveryView, basename='recovery')
 router.register('account', views_api.UserView, basename='about me')
 router.register('account', views_api.AccountView, basename='registration')
+router.register('dogs', views_api.DogView, basename='dogs')
 
 additional_urlpatterns = [
     path('account/authenticate', views_api.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
