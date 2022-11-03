@@ -8,6 +8,9 @@ from api.models import User
 class Breed(models.Model):
     name = models.CharField(max_length=128, verbose_name='Название породы')
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         db_table = 'breeds'
         verbose_name = 'Порода'
@@ -19,7 +22,7 @@ class Dog(models.Model):
     name = models.CharField(max_length=128, verbose_name='Кличка собаки')
     avatar = models.ImageField(upload_to='media/', null=True, blank=True, verbose_name='Аватар')
     hasAvatar = models.BooleanField(verbose_name='Есть ли аватар')
-    data_update_avatar = models.DateTimeField(default=datetime.datetime.now(), verbose_name='Дата обновления аватара')
+    data_update_avatar = models.DateTimeField(auto_now_add=True, verbose_name='Дата обновления аватара')
     breed = models.ForeignKey(Breed, null=True, on_delete=models.SET_NULL, verbose_name='Порода')
     gender = models.BooleanField(verbose_name='Пол (0 - ж, 1 - м)')
     birthday = models.DateField(verbose_name='День рождения')
@@ -30,6 +33,9 @@ class Dog(models.Model):
     about = models.TextField(null=True, blank=True, verbose_name='Текст о собаке')
     food = models.TextField(null=True, blank=True, verbose_name='Информация о питании')
     other = models.TextField(null=True, blank=True, verbose_name='Другая информация')
+
+    def get_avatar(self):
+        return str(self.avatar) if self.avatar else None
 
     class Meta:
         db_table = 'dogs'
