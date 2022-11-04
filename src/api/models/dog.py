@@ -22,7 +22,7 @@ class Dog(models.Model):
     name = models.CharField(max_length=128, verbose_name='Кличка собаки')
     avatar = models.ImageField(upload_to='images/', null=True, blank=True, verbose_name='Аватар')
     has_avatar = models.BooleanField(verbose_name='Есть ли аватар')
-    data_update_avatar = models.DateTimeField(auto_now_add=True, verbose_name='Дата обновления аватара')
+    date_update_avatar = models.DateTimeField(auto_now_add=True, verbose_name='Дата обновления аватара')
     breed = models.ForeignKey(Breed, null=True, on_delete=models.SET_NULL, verbose_name='Порода')
     gender = models.BooleanField(verbose_name='Пол (0 - ж, 1 - м)')
     birthday = models.DateField(verbose_name='День рождения')

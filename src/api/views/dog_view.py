@@ -1,3 +1,5 @@
+import datetime
+
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, mixins
 from rest_framework.parsers import MultiPartParser
@@ -5,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
 from api.models import Dog
-from api.serializers import DogSerializer, DogCreateSerializer
+from api.serializers import DogSerializer, DogCreateSerializer, DogUpdateSerializer
 from packs import Successful, Error
 
 
@@ -79,3 +81,39 @@ class DogView(mixins.RetrieveModelMixin,
         dog.save()
 
         return Successful(data=DogSerializer(dog).data)
+
+    @swagger_auto_schema(
+        tags=['dogs'],
+        request_body=DogUpdateSerializer,
+        responses={
+            status.HTTP_200_OK: DogSerializer,
+        },
+        operation_id='Обновить данные о собаке'
+    )
+    def partial_update(self, request, pk):
+        user = request.user
+        serializer = DogUpdateSerializer(data=request.data, partial=True)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except:
+            return Error(data={'message': 'Неверные данные', 'exit': False})
+
+        validated_data = serializer.validated_data
+
+        dog = Dog.objects.filter(id=pk, account=request.user)
+
+        if not dog.exists():
+            return Error(data={'message': 'У данного пользвателя нет такой собаки', 'exit': False})
+
+        dog = dog.first()
+
+        for x in validated_data:
+            setattr(dog, x, validated_data.get(x))
+
+            if x == 'avatar':
+                dog.date_update_avatar = datetime.datetime.now()
+
+        dog.save()
+
+        return Successful(DogSerializer(dog).data)
