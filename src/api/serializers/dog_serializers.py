@@ -16,3 +16,10 @@ class DogSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dog
         fields = '__all__'
+
+
+class DogCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Dog
+        exclude = ['account', 'has_avatar']
