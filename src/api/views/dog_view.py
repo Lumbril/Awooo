@@ -2,12 +2,13 @@ import datetime
 
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, mixins
+from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
-from api.models import Dog
-from api.serializers import DogSerializer, DogCreateSerializer, DogUpdateSerializer
+from api.models import Dog, Breed
+from api.serializers import DogSerializer, DogCreateSerializer, DogUpdateSerializer, BreedSerializer
 from packs import Successful, Error
 
 
@@ -101,7 +102,7 @@ class DogView(mixins.RetrieveModelMixin,
 
         validated_data = serializer.validated_data
 
-        dog = Dog.objects.filter(id=pk, account=request.user)
+        dog = Dog.objects.filter(id=pk, account=user)
 
         if not dog.exists():
             return Error(data={'message': 'У данного пользвателя нет такой собаки', 'exit': False})
@@ -117,3 +118,16 @@ class DogView(mixins.RetrieveModelMixin,
         dog.save()
 
         return Successful(DogSerializer(dog).data)
+
+    @action(detail=False, methods=['get'], url_path='breeds')
+    @swagger_auto_schema(
+        tags=['dogs'],
+        responses={
+            status.HTTP_200_OK: BreedSerializer,
+        },
+        operation_id='Получить список пород'
+    )
+    def get_breeds(self, request):
+        breeds = Breed.objects.all()
+
+        return Successful(data=BreedSerializer(breeds, many=True).data)

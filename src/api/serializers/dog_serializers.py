@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from rest_framework import serializers
 
-from api.models import Dog
+from api.models import Dog, Breed
 
 
 class DogSerializer(serializers.ModelSerializer):
@@ -41,3 +41,10 @@ class DogUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dog
         exclude = ['account', 'has_avatar']
+
+
+class BreedSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Breed
+        fields = '__all__'
