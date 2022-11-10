@@ -1,17 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from api.models import *
-
-
-@admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    list_display = ['email', 'is_active']
-
-
-@admin.register(Code)
-class CodeAdmin(admin.ModelAdmin):
-    list_display = ['email', 'code', 'type', 'number_of_attempts']
+from api.models import Breed, Dog
 
 
 @admin.register(Breed)
