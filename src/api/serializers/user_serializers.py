@@ -51,3 +51,10 @@ class RecoverySerializer(serializers.Serializer):
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(write_only=True)
     new_password = serializers.CharField(write_only=True)
+
+
+class UserInfoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserModel
+        fields = ['id', 'email']

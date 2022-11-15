@@ -9,6 +9,8 @@ router.register('account', views_api.RecoveryView, basename='recovery')
 router.register('account', views_api.UserView, basename='about me')
 router.register('account', views_api.AccountView, basename='registration')
 router.register('dogs', views_api.DogView, basename='dogs')
+router.register('subscriber', views_api.SubscriberView, basename='subscriber')
+router.register('subscription', views_api.SubscriptionView, basename='subscription')
 
 additional_urlpatterns = [
     path('account/authenticate', views_api.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
