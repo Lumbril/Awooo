@@ -5,7 +5,8 @@ from api.models.subscription import Subscription, BlackList
 
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['user', 'subscription']
+    search_fields = ['user']
 
 
 @admin.register(BlackList)
