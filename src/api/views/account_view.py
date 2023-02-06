@@ -46,7 +46,7 @@ class AccountView(ViewSet):
             message = render_to_string('activation_message.html', {
                 'code': user_code.code,
                 'url': f'https://{DOMAIN_NAME}/activate/',
-                'img': f'https://{DOMAIN_NAME}/media/img',
+                'img': f'https://{DOMAIN_NAME}/static/img',
             })
 
             email_message = EmailMessage(
