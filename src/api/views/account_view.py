@@ -1,4 +1,5 @@
 from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import action
@@ -6,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ViewSet
 
 from Awooo import settings
+from Awooo.settings import DOMAIN_NAME
 from api.models import Code
 from api.serializers import *
 from packs import Successful, Error, EmailSendThread
@@ -20,6 +22,12 @@ class AccountView(ViewSet):
         operation_id='Регистрация'
     )
     def registration(self, request):
+        user_email = request.data['email']
+
+        if UserModel.objects.filter(email=user_email).exists():
+            return Error(data={'message': 'Пользователь с таким email существует',
+                               'exit': False, 'exist': True})
+
         try:
             serializer = UserRegistrationRequestSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -35,12 +43,19 @@ class AccountView(ViewSet):
             user = serializer.create(validated_data)
             serializer = UserRegistrationResponseSerializer(user, partial=True)
 
+            message = render_to_string('activation_message.html', {
+                'code': user_code.code,
+                'url': f'https://{DOMAIN_NAME}/activate/',
+                'img': f'https://{DOMAIN_NAME}/media/img',
+            })
+
             email_message = EmailMessage(
-                'Активация аккаунта',
-                user_code.code,
+                'Активация аккаунта в приложении Awooo',
+                message,
                 settings.EMAIL_HOST_USER,
                 [user.email],
             )
+            email_message.content_subtype = 'html'  # тип текста в письме
 
             EmailSendThread(email_message).start()
 
@@ -50,10 +65,6 @@ class AccountView(ViewSet):
 
             if 'email' in error.keys():
                 error = error['email'][0]
-
-                if error == 'Значения поля должны быть уникальны.':
-                    return Error(data={'message': 'Пользователь с таким email существует',
-                                       'exit': False, 'exist': True})
 
                 return Error(data={'message': error, 'exit': False})
 
