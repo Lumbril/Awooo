@@ -1,5 +1,10 @@
+import base64
+import json
+
 from django.core.mail import EmailMessage
+from django.http import HttpResponse
 from django.template.loader import render_to_string
+from django.views.generic import View
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import action
@@ -12,6 +17,13 @@ from api.models import Code
 from api.serializers import *
 from packs import Successful, Error, EmailSendThread
 from packs.services.code_generator import generate_code
+
+
+class EmailActivation(View):
+    def get(self, request, token):
+        payload = json.loads(base64.b64decode(token.encode(errors='strict')))
+
+        return HttpResponse(content='Successful', status=200)
 
 
 class AccountView(ViewSet):
@@ -43,9 +55,16 @@ class AccountView(ViewSet):
             user = serializer.create(validated_data)
             serializer = UserRegistrationResponseSerializer(user, partial=True)
 
+            payload = {
+                'email': user_email,
+                'code': user_code.code,
+            }
+
+            token = base64.b64encode(json.dumps(payload).encode(errors='strict')).decode(errors='strict')
+
             message = render_to_string('activation_message.html', {
                 'code': user_code.code,
-                'url': f'https://{DOMAIN_NAME}/activate/',
+                'url': f'https://{DOMAIN_NAME}/activate/{token}',
                 'img': f'https://{DOMAIN_NAME}/static/img',
             })
 
