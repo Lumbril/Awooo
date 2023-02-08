@@ -23,6 +23,38 @@ class EmailActivation(View):
     def get(self, request, token):
         payload = json.loads(base64.b64decode(token.encode(errors='strict')))
 
+        user_email = payload['email']
+        user_code = payload['code']
+
+        user = UserModel.objects.filter(email=user_email)
+
+        if not user.exists():
+            return HttpResponse(content='Пользователь не найден', status=400)
+
+        user = user.first()
+
+        if user.is_active:
+            return HttpResponse(content='Пользователь уже активен', status=400)
+
+        code = Code.objects.filter(email=user_email, type=Code.Type.REGISTRATION)
+
+        if not code.exists():
+            return HttpResponse(content='Код больше не действителен, запросите новый', status=400)
+
+        code = code.first()
+
+        if code.code != user_code:
+            code.number_of_attempts += 1
+            code.save()
+
+            if code.number_of_attempts == 5:
+                code.delete()
+
+            return Error(data={'message': 'Код неверный', 'exit': False})
+
+        user.is_active = True
+        user.save()
+
         return HttpResponse(content='Successful', status=200)
 
 
@@ -185,12 +217,26 @@ class AccountView(ViewSet):
         code.type = Code.Type.REGISTRATION
         code.save()
 
+        payload = {
+            'email': user.email,
+            'code': code.code,
+        }
+
+        token = base64.b64encode(json.dumps(payload).encode(errors='strict')).decode(errors='strict')
+
+        message = render_to_string('activation_message.html', {
+            'code': code.code,
+            'url': f'https://{DOMAIN_NAME}/activate/{token}',
+            'img': f'https://{DOMAIN_NAME}/static/img',
+        })
+
         email_message = EmailMessage(
-            'Активация аккаунта',
-            code.code,
+            'Активация аккаунта в приложении Awooo',
+            message,
             settings.EMAIL_HOST_USER,
             [user.email],
         )
+        email_message.content_subtype = 'html'
 
         EmailSendThread(email_message).start()
 
@@ -276,10 +322,10 @@ class RecoveryView(ViewSet):
 
         user = user.first()
 
-        if not user.is_active:
-            return Error(data={'message': 'Пользователь не активен', 'exit': False})
+        if user.is_active:
+            return Error(data={'message': 'Пользователь активен', 'exit': False})
 
-        code_user = Code.objects.filter(email=email, type=Code.Type.CHANGE_PASSWORD)
+        code_user = Code.objects.filter(email=email, type=Code.Type.REGISTRATION)
 
         if not code_user.exists():
             return Error(data={'message': 'Код больше не действителен, запросите новый', 'exit': False})
@@ -294,6 +340,9 @@ class RecoveryView(ViewSet):
                 code_user.delete()
 
             return Error(data={'message': 'Код неверный', 'exit': False})
+
+        user.is_active = True
+        user.save()
 
         return Successful()
 
