@@ -50,12 +50,12 @@ class EmailActivation(View):
             if code.number_of_attempts == 5:
                 code.delete()
 
-            return Error(data={'message': 'Код неверный', 'exit': False})
+            return HttpResponse(content='Код неверный', status=400)
 
         user.is_active = True
         user.save()
 
-        return HttpResponse(content='Successful', status=200)
+        return HttpResponse(content='Почта подтверждена, повторите авторизацию в приложении', status=200)
 
 
 class AccountView(ViewSet):

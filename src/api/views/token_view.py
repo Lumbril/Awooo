@@ -33,15 +33,17 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             user = user.first()
 
             if not user.is_active:
-                Error(data={
-                    'message': 'Пользователь не подтвердил почту',
+                return Error(data={
+                    'message': 'На вашу почту выслан код подтверждения. Подтвердите почту по ссылке из письма или в '
+                               'введите в приложении',
                     'exit': False,
+                    'confirm': False,
                 })
 
             return Error(data={
-                            'message': 'Данные некорректны',
-                            'exit': False,
-                            })
+                'message': 'Данные некорректны',
+                'exit': False,
+            })
 
 
 class CustomTokenRefreshView(TokenRefreshView):
