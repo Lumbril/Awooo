@@ -1,5 +1,3 @@
-from io import StringIO
-
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import parsers, mixins
 from rest_framework.permissions import IsAdminUser
@@ -10,7 +8,6 @@ from api.serializers import FileUploadSerializer
 from packs import Successful, Error
 
 import pandas as pd
-import xlrd
 
 
 class UploadFileView(mixins.CreateModelMixin,

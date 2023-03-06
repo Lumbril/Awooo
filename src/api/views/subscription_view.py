@@ -1,6 +1,5 @@
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, mixins
-from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
@@ -13,6 +12,8 @@ class SubscriberView(mixins.RetrieveModelMixin,
                      mixins.ListModelMixin,
                      GenericViewSet):
     permission_classes = [IsAuthenticated]
+    serializer_class = SubscriptionSerializer
+    queryset = Subscription.objects.all()
 
     @swagger_auto_schema(
         tags=['subscriber'],
@@ -52,6 +53,8 @@ class SubscriptionView(mixins.RetrieveModelMixin,
                        mixins.CreateModelMixin,
                        GenericViewSet):
     permission_classes = [IsAuthenticated]
+    serializer_class = MySubscriptionSerializer
+    queryset = Subscription.objects.all()
 
     @swagger_auto_schema(
         tags=['subscription'],

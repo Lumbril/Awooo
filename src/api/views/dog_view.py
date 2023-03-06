@@ -3,7 +3,6 @@ import datetime
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, mixins
 from rest_framework.decorators import action
-from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
@@ -17,7 +16,8 @@ class DogView(mixins.RetrieveModelMixin,
               mixins.CreateModelMixin,
               GenericViewSet):
     permission_classes = [IsAuthenticated]
-    parser_classes = (MultiPartParser,)
+    serializer_class = DogSerializer
+    queryset = Dog.objects.all()
 
     @swagger_auto_schema(
         tags=['dogs'],
