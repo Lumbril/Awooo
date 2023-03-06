@@ -118,16 +118,3 @@ class DogView(mixins.RetrieveModelMixin,
         dog.save()
 
         return Successful(DogSerializer(dog).data)
-
-    @action(detail=False, methods=['get'], url_path='breeds')
-    @swagger_auto_schema(
-        tags=['dogs'],
-        responses={
-            status.HTTP_200_OK: BreedSerializer,
-        },
-        operation_id='Получить список пород'
-    )
-    def get_breeds(self, request):
-        breeds = Breed.objects.all()
-
-        return Successful(data=BreedSerializer(breeds, many=True).data)

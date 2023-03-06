@@ -1,27 +1,35 @@
+from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import parsers, mixins
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
 from api.models import Breed
-from api.serializers import FileUploadSerializer
+from api.serializers import FileUploadSerializer, BreedSerializer
 from packs import Successful, Error
 
 import pandas as pd
 
 
+@method_decorator(name='list',
+                  decorator=swagger_auto_schema(
+                      operation_id="Получить список пород"))
 class UploadFileView(mixins.CreateModelMixin,
+                     mixins.ListModelMixin,
                      GenericViewSet):
-    serializer_class = FileUploadSerializer
+    queryset = Breed.objects.all()
+    serializer_class = BreedSerializer
     parser_classes = (parsers.FormParser, parsers.MultiPartParser, parsers.FileUploadParser)
-    permission_classes = (IsAdminUser,)
+    permission_classes = (IsAuthenticated,)
 
     @swagger_auto_schema(
-        tags=['admin'],
+        tags=['breeds'],
+        request_body=FileUploadSerializer,
         operation_id='Загрузить файл с породами собак'
     )
+    @permission_classes([IsAdminUser])
     def create(self, request):
-        serializer = self.serializer_class(data=request.data)
+        serializer = FileUploadSerializer(data=request.data)
 
         try:
             serializer.is_valid(raise_exception=True)
