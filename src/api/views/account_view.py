@@ -132,10 +132,9 @@ class AccountView(ViewSet):
     )
     def confirm(self, request):
         serializer = ConfirmCodeRequestSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
 
         try:
-            pass
+            serializer.is_valid(raise_exception=True)
         except:
             return Error(data={'message': 'Почта введена неверно', 'exit': False})
 
@@ -252,10 +251,9 @@ class RecoveryView(ViewSet):
     )
     def post(self, request):
         serializer = RecoveryRequestCodeSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
 
         try:
-            pass
+            serializer.is_valid(raise_exception=True)
         except:
             return Error(data={'message': 'Почта введена неверно', 'exit': False})
 
@@ -270,7 +268,12 @@ class RecoveryView(ViewSet):
         user = user.first()
 
         if not user.is_active:
-            return Error(data={'message': 'Пользователь не активен', 'exit': False})
+            return Error(data={
+                'message': 'На вашу почту выслан код подтверждения. Подтвердите почту по ссылке из '
+                           'письма или введите в приложении',
+                'confirm': False,
+                'exit': False
+            })
 
         user_code = Code.objects.filter(email=email, type=Code.Type.CHANGE_PASSWORD)
 
@@ -323,7 +326,10 @@ class RecoveryView(ViewSet):
         user = user.first()
 
         if user.is_active:
-            return Error(data={'message': 'Пользователь активен', 'exit': False})
+            return Error(data={
+                'message': 'Пользователь активен',
+                'exit': False
+            })
 
         code_user = Code.objects.filter(email=email, type=Code.Type.REGISTRATION)
 
@@ -354,10 +360,9 @@ class RecoveryView(ViewSet):
     )
     def verify(self, request):
         serializer = RecoverySerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
 
         try:
-            pass
+            serializer.is_valid(raise_exception=True)
         except:
             return Error(data={'message': 'Почта введена неверно', 'exit': False})
 
@@ -374,7 +379,12 @@ class RecoveryView(ViewSet):
         user = user.first()
 
         if not user.is_active:
-            return Error(data={'message': 'Пользователь не активен', 'exit': False})
+            return Error(data={
+                'message': 'На вашу почту выслан код подтверждения. Подтвердите почту по ссылке из '
+                           'письма или введите в приложении',
+                'confirm': False,
+                'exit': False
+            })
 
         code_user = Code.objects.filter(email=email, type=Code.Type.CHANGE_PASSWORD)
 

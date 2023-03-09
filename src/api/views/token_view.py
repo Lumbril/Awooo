@@ -34,7 +34,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
             if not user.is_active:
                 return Error(data={
-                    'message': 'На вашу почту выслан код подтверждения. Подтвердите почту по ссылке из письма или в '
+                    'message': 'На вашу почту выслан код подтверждения. Подтвердите почту по ссылке из письма или '
                                'введите в приложении',
                     'exit': False,
                     'confirm': False,
