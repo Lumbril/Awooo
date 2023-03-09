@@ -307,10 +307,9 @@ class RecoveryView(ViewSet):
     )
     def verify_code(self, request):
         serializer = RecoveryCodeSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
 
         try:
-            pass
+            serializer.is_valid(raise_exception=True)
         except:
             return Error(data={'message': 'Почта введена неверно', 'exit': False})
 
@@ -325,13 +324,15 @@ class RecoveryView(ViewSet):
 
         user = user.first()
 
-        if user.is_active:
+        if not user.is_active:
             return Error(data={
-                'message': 'Пользователь активен',
+                'message': 'На вашу почту выслан код подтверждения. Подтвердите почту по ссылке из '
+                           'письма или введите в приложении',
+                'confirm': False,
                 'exit': False
             })
 
-        code_user = Code.objects.filter(email=email, type=Code.Type.REGISTRATION)
+        code_user = Code.objects.filter(email=email, type=Code.Type.CHANGE_PASSWORD)
 
         if not code_user.exists():
             return Error(data={'message': 'Код больше не действителен, запросите новый', 'exit': False})
@@ -346,9 +347,6 @@ class RecoveryView(ViewSet):
                 code_user.delete()
 
             return Error(data={'message': 'Код неверный', 'exit': False})
-
-        user.is_active = True
-        user.save()
 
         return Successful()
 
