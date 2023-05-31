@@ -11,6 +11,6 @@ class Successful(Response):
 class Error(Response):
 
     def __init__(self, data={'message': 'Неизвестная ошибка', 'exit': True},
-                 status=status.HTTP_200_OK):
+                 status=status.HTTP_400_BAD_REQUEST):
         data['status'] = 'error'
         super().__init__(data=data, status=status)
