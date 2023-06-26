@@ -55,6 +55,14 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 class UserInfoSerializer(serializers.ModelSerializer):
 
+    def to_representation(self, instance):
+        instance = super().to_representation(instance)
+
+        if instance['hide_phone']:
+            instance.pop('phone')
+
+        return instance
+
     class Meta:
         model = UserModel
         fields = ['id', 'email']

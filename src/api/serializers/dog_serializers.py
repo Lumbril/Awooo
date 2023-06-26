@@ -7,14 +7,6 @@ from api.models import Dog, Breed
 
 class DogSerializer(serializers.ModelSerializer):
 
-    def to_representation(self, instance):
-        instance = super().to_representation(instance)
-
-        if instance['hide_phone']:
-            instance.pop('phone')
-
-        return instance
-
     class Meta:
         model = Dog
         fields = '__all__'
@@ -48,3 +40,11 @@ class BreedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Breed
         fields = '__all__'
+
+
+class DogAvatarSerializer(serializers.ModelSerializer):
+    avatar = serializers.ImageField(allow_empty_file=False)
+
+    class Meta:
+        model = Dog
+        fields = ['avatar']

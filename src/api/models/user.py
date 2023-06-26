@@ -35,6 +35,8 @@ class CustomUserManager(BaseUserManager):
 class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True, blank=False, null=False)
+    phone = models.CharField(max_length=30, null=True, blank=True, verbose_name='Номер телефона')
+    hide_phone = models.BooleanField(default=True, verbose_name='Скрыть номер')
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

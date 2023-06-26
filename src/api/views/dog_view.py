@@ -1,13 +1,14 @@
 import datetime
 
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import status, mixins
+from rest_framework import status, mixins, parsers
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
 from api.models import Dog, Breed
-from api.serializers import DogSerializer, DogCreateSerializer, DogUpdateSerializer, BreedSerializer
+from api.serializers import DogSerializer, DogCreateSerializer, DogUpdateSerializer, BreedSerializer, \
+    DogAvatarSerializer
 from packs import Successful, Error
 
 
@@ -16,6 +17,7 @@ class DogView(mixins.RetrieveModelMixin,
               mixins.CreateModelMixin,
               GenericViewSet):
     permission_classes = [IsAuthenticated]
+    parser_classes = (parsers.FormParser, parsers.MultiPartParser, parsers.FileUploadParser)
     serializer_class = DogSerializer
     queryset = Dog.objects.all()
 
@@ -118,3 +120,57 @@ class DogView(mixins.RetrieveModelMixin,
         dog.save()
 
         return Successful(DogSerializer(dog).data)
+
+    @action(detail=True, methods=['post'], url_path='avatar')
+    @swagger_auto_schema(
+        tags=['dogs'],
+        request_body=DogAvatarSerializer,
+        responses={
+            status.HTTP_200_OK: DogSerializer,
+        },
+        operation_id='Загрузить аватарку собаки'
+    )
+    def avatar(self, request, pk):
+        serializer = DogAvatarSerializer(data=request.data)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except:
+            return Error(data={'message': serializer.errors, 'exit': False})
+
+        data = serializer.validated_data
+
+        dog = Dog.objects.filter(id=pk, account=request.user)
+
+        if not dog.exists():
+            return Error(data={'message': 'У вас нет такой собаки', 'exit': False})
+
+        dog = dog.first()
+
+        dog.avatar = data['avatar']
+        dog.has_avatar = True
+        dog.save()
+
+        return Successful()
+
+    @avatar.mapping.delete
+    @swagger_auto_schema(
+        tags=['dogs'],
+        responses={
+            status.HTTP_200_OK: DogSerializer,
+        },
+        operation_id='Удалить аватарку собаки'
+    )
+    def delete_avatar(self, request, pk):
+        dog = Dog.objects.filter(id=pk, account=request.user)
+
+        if not dog.exists():
+            return Error(data={'message': 'У вас нет такой собаки', 'exit': False})
+
+        dog = dog.first()
+
+        dog.avatar = None
+        dog.has_avatar = False
+        dog.save()
+
+        return Successful()
