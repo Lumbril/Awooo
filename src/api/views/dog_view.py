@@ -19,11 +19,6 @@ class DogView(mixins.RetrieveModelMixin,
     serializer_class = DogSerializer
     queryset = Dog.objects.all()
 
-    def get_parsers(self):
-        if self.action == 'avatar':
-            return [parsers.FormParser, parsers.MultiPartParser, parsers.FileUploadParser]
-        return self.parser_classes
-
     @swagger_auto_schema(
         tags=['dogs'],
         responses={
@@ -124,7 +119,8 @@ class DogView(mixins.RetrieveModelMixin,
 
         return Successful(DogSerializer(dog).data)
 
-    @action(detail=True, methods=['post'], url_path='avatar')
+    @action(detail=True, methods=['post'], url_path='avatar',
+            parser_classes=[parsers.FormParser, parsers.MultiPartParser, parsers.FileUploadParser])
     @swagger_auto_schema(
         tags=['dogs'],
         request_body=DogAvatarSerializer,
