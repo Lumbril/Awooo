@@ -6,9 +6,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
-from api.models import Dog, Breed
-from api.serializers import DogSerializer, DogCreateSerializer, DogUpdateSerializer, BreedSerializer, \
-    DogAvatarSerializer
+from api.models import Dog
+from api.serializers import DogSerializer, DogCreateSerializer, DogUpdateSerializer, DogAvatarSerializer
 from packs import Successful, Error
 
 
@@ -17,9 +16,13 @@ class DogView(mixins.RetrieveModelMixin,
               mixins.CreateModelMixin,
               GenericViewSet):
     permission_classes = [IsAuthenticated]
-    parser_classes = (parsers.FormParser, parsers.MultiPartParser, parsers.FileUploadParser)
     serializer_class = DogSerializer
     queryset = Dog.objects.all()
+
+    def get_parsers(self):
+        if self.action == 'avatar':
+            return [parsers.FormParser, parsers.MultiPartParser, parsers.FileUploadParser]
+        return self.parser_classes
 
     @swagger_auto_schema(
         tags=['dogs'],

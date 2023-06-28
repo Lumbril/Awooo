@@ -16,7 +16,7 @@ class DogCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Dog
-        exclude = ['account', 'has_avatar']
+        exclude = ['account', 'avatar', 'has_avatar']
 
 
 class DogUpdateSerializer(serializers.ModelSerializer):
