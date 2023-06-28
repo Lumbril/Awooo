@@ -6,6 +6,16 @@ from api.models import Dog, Breed
 
 
 class DogSerializer(serializers.ModelSerializer):
+    def to_internal_value(self, data):
+        data['gender'] = bool(data['gender'])
+
+        return super().to_internal_value(data)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['gender'] = int(data['gender'])
+
+        return data
 
     class Meta:
         model = Dog
