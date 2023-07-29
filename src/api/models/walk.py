@@ -1,21 +1,21 @@
 from django.db import models
 
-from api.models import User
+from api.models import Dog
 
 
 class Walk(models.Model):
     start = models.DateTimeField(verbose_name='Время начала')
     finish = models.DateTimeField(verbose_name='Время окончания')
     time = models.IntegerField(verbose_name='Фактическое время прогулки')
-    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, verbose_name='Пользователь')
+    dog = models.ForeignKey(Dog, null=True, on_delete=models.SET_NULL, verbose_name='Собака')
     date_created = models.DateTimeField(null=True, auto_now_add=True, verbose_name='Дата создания')
     date_edited = models.DateTimeField(null=True, auto_now=True, verbose_name='Изменено')
     date_deleted = models.DateTimeField(null=True, blank=True, verbose_name='Дата удаления')
 
     def __str__(self):
-        walk_with_user = Walk.objects.select_related('user').get(id=self.id)
+        walk_with_user = Walk.objects.select_related('dog').get(id=self.id)
 
-        return f'{walk_with_user.user} - {walk_with_user.start} : {walk_with_user.finish}'
+        return f'{walk_with_user.dog} - {walk_with_user.start} : {walk_with_user.finish}'
 
     class Meta:
         db_table = 'walks'
