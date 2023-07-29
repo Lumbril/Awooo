@@ -37,6 +37,9 @@ class User(AbstractUser):
     email = models.EmailField(unique=True, blank=False, null=False)
     phone = models.CharField(max_length=30, null=True, blank=True, verbose_name='Номер телефона')
     hide_phone = models.BooleanField(default=True, verbose_name='Скрыть номер')
+    date_created = models.DateTimeField(null=True, auto_now_add=True, verbose_name='Дата создания')
+    date_edited = models.DateTimeField(null=True, auto_now=True, verbose_name='Изменено')
+    date_deleted = models.DateTimeField(null=True, blank=True, verbose_name='Дата удаления')
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

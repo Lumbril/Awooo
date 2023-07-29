@@ -30,7 +30,10 @@ class Dog(models.Model):
     owner = models.TextField(null=True, blank=True, verbose_name='Владельцы')
     about = models.TextField(null=True, blank=True, verbose_name='Текст о собаке')
     food = models.TextField(null=True, blank=True, verbose_name='Информация о питании')
-    other = models.TextField(null=True, blank=True, verbose_name='Другая информация')
+    other = models.TextField(null=True, blank=True, verbose_name='Другая информация')   
+    date_created = models.DateTimeField(null=True, auto_now_add=True, verbose_name='Дата создания')
+    date_edited = models.DateTimeField(null=True, auto_now=True, verbose_name='Изменено')
+    date_deleted = models.DateTimeField(null=True, blank=True, verbose_name='Дата удаления')
 
     def get_avatar(self):
         return str(self.avatar) if self.avatar else None
