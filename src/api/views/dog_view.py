@@ -6,8 +6,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
-from api.models import Dog
-from api.serializers import DogSerializer, DogCreateSerializer, DogUpdateSerializer, DogAvatarSerializer
+from api.models import Dog, Walk
+from api.serializers import DogSerializer, DogCreateSerializer, DogUpdateSerializer, DogAvatarSerializer, WalkSerializer
 from packs import Successful, Error
 
 
@@ -175,3 +175,21 @@ class DogView(mixins.RetrieveModelMixin,
         dog.save()
 
         return Successful()
+
+    @action(detail=True, methods=['get'], url_path='walks')
+    @swagger_auto_schema(
+        tags=['dogs'],
+        responses={
+            status.HTTP_200_OK: WalkSerializer,
+        },
+        operation_id='Список прогулок собаки'
+    )
+    def walks_list(self, request, pk):
+        if not Dog.objects.filter(id=pk, account=request.user).exists():
+            return Error(data={'message': 'У вас нет такой собаки', 'exit': False})
+
+        dog_walks = Walk.objects.select_related('dog').filter(dog_id=pk)
+
+        serializer = WalkSerializer(dog_walks, many=True)
+
+        return Successful(data=serializer.data)

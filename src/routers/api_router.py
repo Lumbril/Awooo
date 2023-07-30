@@ -12,6 +12,7 @@ router.register('dogs', views_api.DogView, basename='dogs')
 router.register('subscriber', views_api.SubscriberView, basename='subscriber')
 router.register('subscription', views_api.SubscriptionView, basename='subscription')
 router.register('breeds', views_api.UploadFileView, basename='file upload')
+router.register('walks', views_api.WalkView, basename='walks')
 
 additional_urlpatterns = [
     path('account/authenticate', views_api.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
