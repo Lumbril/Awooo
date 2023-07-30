@@ -15,8 +15,7 @@ from Awooo import settings
 from Awooo.settings import DOMAIN_NAME
 from api.models import Code
 from api.serializers import *
-from packs import Successful, Error, EmailSendThread
-from packs.services.code_generator import generate_code
+from packs import Successful, Error, EmailSendThread, generate_code
 
 
 class EmailActivation(View):

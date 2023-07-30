@@ -27,7 +27,8 @@ class DogView(mixins.RetrieveModelMixin,
         operation_id='Получить список собак пользователя'
     )
     def list(self, request):
-        dog_list = Dog.objects.filter(account=request.user)
+        dog_list = Dog.objects.select_related('account').\
+            select_related('breed').filter(account=request.user)
 
         serializer = DogSerializer(dog_list, many=True)
 
@@ -41,7 +42,8 @@ class DogView(mixins.RetrieveModelMixin,
         operation_id='Получить информацию о собаке'
     )
     def retrieve(self, request, pk):
-        dog = Dog.objects.filter(id=pk, account=request.user)
+        dog = Dog.objects.select_related('account').\
+            select_related('breed').filter(id=pk, account=request.user)
 
         if not dog.exists():
             return Error(data={'message': 'У пользователя нет такой собаки', 'exit': False})
