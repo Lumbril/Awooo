@@ -188,7 +188,7 @@ class DogView(mixins.RetrieveModelMixin,
         if not Dog.objects.filter(id=pk, account=request.user).exists():
             return Error(data={'message': 'У вас нет такой собаки', 'exit': False})
 
-        dog_walks = Walk.objects.select_related('dog').filter(dog_id=pk)
+        dog_walks = Walk.objects.select_related('dog').filter(dog_id=pk, finish__isnull=False, date_deleted__isnull=True)
 
         serializer = WalkSerializer(dog_walks, many=True)
 

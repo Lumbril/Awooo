@@ -4,8 +4,7 @@ from collections import OrderedDict
 from django.db.models import Sum
 from rest_framework import serializers
 
-from api.models import Dog, Breed, Walk, Coordinate
-from packs import get_distance
+from api.models import Dog, Breed, Walk
 
 
 class DogSerializer(serializers.ModelSerializer):
@@ -18,23 +17,24 @@ class DogSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         data['gender'] = int(data['gender'])
 
-        walks_time_total = Walk.objects.filter(dog_id=data['id']).aggregate(time_total=Sum('time'))
-
-        data['time_total'] = int(walks_time_total['time_total']) \
-            if walks_time_total['time_total'] else 0
-
-        points_all = list(Coordinate.objects.select_related('walk__dog')
-                          .filter(walk__dog_id=data['id']))
-        distance_total = get_distance(points_all)
-        data['distance_total'] = distance_total
+        walks_total = Walk.objects.filter(dog_id=data['id'], finish__isnull=False,
+                                          date_deleted__isnull=True) \
+            .aggregate(time_total=Sum('time'), distance_total=Sum('distance'))
+        data['time_total'] = int(walks_total['time_total']) \
+            if walks_total['time_total'] else 0
+        data['distance_total'] = float(walks_total['distance_total']) \
+            if walks_total['distance_total'] else 0
 
         current_datetime = datetime.datetime.now()
-        points_today = list(Coordinate.objects.select_related('walk__dog')
-                            .filter(walk__dog_id=data['id'], walk__date_created__year=current_datetime.year,
-                                    walk__date_created__month=current_datetime.month,
-                                    walk__date_created__day=current_datetime.day))
-        distance_today = get_distance(points_today)
-        data['distance_today'] = distance_today
+        walks_today = Walk.objects.filter(dog_id=data['id'], finish__isnull=False,
+                                          date_deleted__isnull=True,
+                                          start__year=current_datetime.year,
+                                          start__month=current_datetime.month,
+                                          start__day=current_datetime.day) \
+            .aggregate(distance_today=Sum('distance'))
+        data['distance_today'] = int(walks_today['distance_today']) \
+            if walks_today['distance_today'] else 0
+
         data['subscribes_count'] = 0
 
         return data

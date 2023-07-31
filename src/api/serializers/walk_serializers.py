@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from api.models import Walk, Coordinate
-from packs import get_distance
 
 
 class CoordinateSerializer(serializers.ModelSerializer):
@@ -11,18 +10,9 @@ class CoordinateSerializer(serializers.ModelSerializer):
 
 
 class WalkSerializer(serializers.ModelSerializer):
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-
-        points = list(Coordinate.objects.filter(walk_id=data['id']))
-        distance = get_distance(points)
-        data['distance'] = distance
-
-        return data
-
     class Meta:
         model = Walk
-        fields = ['id', 'start', 'finish', 'time']
+        exclude = ['dog']
 
 
 class WalkDetailSerializer(serializers.ModelSerializer):
@@ -31,3 +21,26 @@ class WalkDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Walk
         fields = '__all__'
+
+
+class WalkCreateSerializer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        return Walk.objects.create(**validated_data)
+
+    class Meta:
+        model = Walk
+        fields = ['start', 'dog']
+
+
+class WalkPartialUpdateSerializer(serializers.ModelSerializer):
+    def update(self, instance, validated_data):
+        for field in validated_data:
+            setattr(instance, field, validated_data.get(field))
+
+        instance.save()
+
+        return instance
+
+    class Meta:
+        model = Walk
+        fields = ['start', 'finish', 'distance', 'time']
