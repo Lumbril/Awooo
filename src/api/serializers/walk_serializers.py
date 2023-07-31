@@ -1,12 +1,7 @@
 from rest_framework import serializers
 
-from api.models import Walk, Coordinate
-
-
-class CoordinateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Coordinate
-        fields = '__all__'
+from api.models import Walk
+from .coordinate_serializers import CoordinateSerializer
 
 
 class WalkSerializer(serializers.ModelSerializer):
