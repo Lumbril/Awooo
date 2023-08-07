@@ -37,6 +37,8 @@ DOMAIN_NAME = 'awooo.app'
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
+
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -113,6 +115,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Awooo.wsgi.application'
+ASGI_APPLICATION = 'Awooo.asgi.application'
 
 
 # Password validation

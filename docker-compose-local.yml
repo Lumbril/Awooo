@@ -2,13 +2,12 @@ version: '3.3'
 
 services:
   web:
-    build: ./src
+    build:
+      context: ./src
+      dockerfile: Dockerfile.local
     restart: always
     ports:
       - 8000:8000
-    volumes:
-      - ./persistentdata/static:/var/www/static
-      - ./persistentdata/media:/var/www/media
     env_file:
       - ./src/.envLocal
     depends_on:
@@ -16,8 +15,6 @@ services:
 
   db:
     image: postgres:13.0-alpine
-    volumes:
-      - ./persistentdata/db:/var/lib/postgresql/data/
     ports:
       - 5432:5432
     env_file:
