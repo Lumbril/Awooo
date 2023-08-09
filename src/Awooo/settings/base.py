@@ -31,6 +31,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').replace(' ', '').split(',')
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1']
 DOMAIN_NAME = 'awooo.app'
 
 
@@ -38,6 +39,7 @@ DOMAIN_NAME = 'awooo.app'
 
 INSTALLED_APPS = [
     'daphne',
+    'channels',
 
     'jazzmin',
     'django.contrib.admin',

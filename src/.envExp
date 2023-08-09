@@ -19,3 +19,6 @@ EMAIL_HOST_USER=example@example.app
 EMAIL_HOST_PASSWORD=example
 
 NGINX_DOMAIN=example.com
+
+REDIS_HOST=localhost
+REDIS_PORT=6379

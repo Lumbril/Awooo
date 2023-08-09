@@ -30,5 +30,21 @@ LOGGING = {
     },
 }
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
+
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             'hosts': [('redis', 6379)],
+#         },
+#     },
+# }
+
+STATIC_ROOT = '/var/www/static'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
