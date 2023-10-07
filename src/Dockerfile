@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.10
 
 WORKDIR /app
 
@@ -13,4 +13,6 @@ RUN pip3 install -r requirements.txt
 
 COPY . ./src
 
-CMD gunicorn --chdir ./src Awooo.wsgi:application --bind 0.0.0.0:8000
+WORKDIR /app/src
+
+CMD daphne -b 0.0.0.0 -p 8000 Awooo.asgi:application

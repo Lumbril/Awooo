@@ -34,6 +34,7 @@ services:
 
   db:
     image: postgres:13.0-alpine
+    restart: always
     volumes:
       - ./persistentdata/db:/var/lib/postgresql/data/
     ports:
@@ -43,6 +44,7 @@ services:
 
   certbot:
     image: certbot/certbot
+    restart: always
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
     volumes:
       - ./persistentdata/certbot/conf:/etc/letsencrypt
