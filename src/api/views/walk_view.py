@@ -2,6 +2,7 @@ import datetime
 
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, mixins
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
@@ -65,7 +66,8 @@ class WalkView(mixins.RetrieveModelMixin,
         },
         operation_id='Обновить прогулку (завершение)'
     )
-    def partial_update(self, request, pk):
+    @action(detail=True, methods=['post'], url_path='walk_upd')
+    def partial_upd(self, request, pk):
         walk = Walk.objects.select_related('dog__account').filter(id=pk, dog__account=request.user,
                                                                   date_deleted__isnull=True)
 
