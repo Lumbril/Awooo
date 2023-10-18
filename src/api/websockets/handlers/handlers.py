@@ -9,7 +9,7 @@ class BaseHandler:
         raise NotImplementedError
 
     @staticmethod
-    def check_field(sub, main):
+    def check_fields(sub, main):
         for i in main:
             if not (i in sub):
                 return False
@@ -27,7 +27,7 @@ class ChatHandler(BaseHandler):
         self.consumer = consumer
 
     async def handle_event(self, message):
-        if not self.check_field(list(message.keys()), self.fields):
+        if not self.check_fields(list(message.keys()), self.fields):
             await self.consumer.channel_layer.group_send(
                 self.consumer.user_id, {
                     'type': 'error',

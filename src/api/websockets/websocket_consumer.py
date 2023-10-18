@@ -13,6 +13,11 @@ class WebSocketConsumer(AsyncWebsocketConsumer):
         'chat': ChatHandler,
     }
 
+    fields = [
+        'action',
+        'message'
+    ]
+
     def __init__(self, *args, **kwargs):
         super().__init__(args, kwargs)
         self.chat_field = ['destination', 'message']
@@ -29,11 +34,21 @@ class WebSocketConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, code):
-        pass
+        await self.channel_layer.group_discard(self.user_id, self.channel_name)
 
     async def receive(self, text_data=None, bytes_data=None):
         try:
             text_data_json = json.loads(text_data)
+
+            if not self.check_fields(text_data_json, self.fields):
+                await self.channel_layer.group_send(
+                    self.user_id, {
+                        'type': 'error',
+                        'error': 'Wrong format'
+                    }
+                )
+                return
+
             action = text_data_json['action']
             message = text_data_json['message']
 
@@ -70,3 +85,11 @@ class WebSocketConsumer(AsyncWebsocketConsumer):
                 'error': event['error']
             }
         ))
+
+    @staticmethod
+    def check_fields(sub, main):
+        for i in main:
+            if not (i in sub):
+                return False
+
+        return True
