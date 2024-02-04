@@ -1,5 +1,7 @@
 import datetime
 
+from channels.db import database_sync_to_async
+
 
 class BaseHandler:
     def __init__(self, consumer):
@@ -19,7 +21,9 @@ class BaseHandler:
 
 class ChatHandler(BaseHandler):
     fields = [
+        'author_dog',
         'destination',
+        'destination_dog',
         'message'
     ]
 
@@ -58,3 +62,8 @@ class ChatHandler(BaseHandler):
                 'message': message
             }
         )
+
+
+@database_sync_to_async
+def smth():
+    pass

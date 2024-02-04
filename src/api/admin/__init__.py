@@ -3,3 +3,4 @@ from .dog_admin import *
 from .subscription_admin import *
 from .notification_admin import *
 from .walk_admin import *
+from .chat_admin import *
