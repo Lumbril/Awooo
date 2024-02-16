@@ -1,6 +1,6 @@
-import datetime
-
 from channels.db import database_sync_to_async
+
+from api.models import Chat, Dog, Participant, Message
 
 
 class BaseHandler:
@@ -21,10 +21,8 @@ class BaseHandler:
 
 class ChatHandler(BaseHandler):
     fields = [
-        'author_dog',
-        'destination',
-        'destination_dog',
-        'message'
+        'chat_id',
+        'message',
     ]
 
     def __init__(self, consumer):
@@ -42,28 +40,72 @@ class ChatHandler(BaseHandler):
             return
 
         author = self.consumer.user_id
-        destination = message['destination']
-        message['author'] = author
-        message['date_created'] = str(datetime.datetime.now())
+        chat_id = message['chat_id']
+        access, author_participant = await check_access(chat_id, int(author))
 
-        await self.consumer.channel_layer.group_send(
-            author,
-            {
-                'type': 'get_response',
-                'action': 'chat',
-                'message': message
-            }
-        )
-        await self.consumer.channel_layer.group_send(
-            destination,
-            {
-                'type': 'get_response',
-                'action': 'chat',
-                'message': message
-            }
-        )
+        if not access:
+            await self.consumer.channel_layer.group_send(
+                self.consumer.user_id, {
+                    'type': 'error',
+                    'error': 'Access denied for this chat'
+                }
+            )
+
+            return
+
+        message = await save_message(chat_id, author_participant, message['message'])
+        message = get_json_from_message(message)
+        recipients = [str(participant.user_id)
+                      for participant in (await get_participants_in_chat(chat_id))]
+
+        for recipient in recipients:
+            await self.consumer.channel_layer.group_send(
+                recipient, {
+                    'type': 'get_response',
+                    'action': 'chat',
+                    'message': message
+                }
+            )
 
 
 @database_sync_to_async
-def smth():
-    pass
+def check_access(chat_id, user_id):
+    participant = Participant.objects.filter(chat_participants__id=chat_id, user__id=user_id)
+
+    if not participant.exists():
+        return False, None
+
+    participant = participant.first()
+
+    if Dog.objects.filter(id=participant.dog_id, account__id=participant.user_id).exists():
+        return True, participant
+    else:
+        return False, None
+
+
+@database_sync_to_async
+def save_message(chat_id, author_participant, message_text):
+    message = Message()
+    message.chat = Chat.objects.get(id=chat_id)
+    message.author = author_participant
+    message.message = message_text
+    message.state = Message.Type.SENT
+
+    Message.save(message)
+
+    return message
+
+
+@database_sync_to_async
+def get_participants_in_chat(chat_id):
+    return list(Participant.objects.filter(chat_participants__id=chat_id))
+
+
+def get_json_from_message(message):
+    return {
+        'chat_id': message.chat.id,
+        'author_id': message.author_id,
+        'message': message.message,
+        'state': message.state,
+        'date_created': str(message.date_created)
+    }
