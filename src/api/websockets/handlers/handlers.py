@@ -1,6 +1,6 @@
 from channels.db import database_sync_to_async
 
-from api.models import Chat, Dog, Participant, Message
+from api.models import Chat, Dog, Participant, Message, User
 
 
 class BaseHandler:
@@ -54,7 +54,7 @@ class ChatHandler(BaseHandler):
             return
 
         message = await save_message(chat_id, author_participant, message['message'])
-        message = get_json_from_message(message)
+        message = await get_json_from_message(message)
         recipients = [str(participant.user_id)
                       for participant in (await get_participants_in_chat(chat_id))]
 
@@ -101,10 +101,20 @@ def get_participants_in_chat(chat_id):
     return list(Participant.objects.filter(chat_participants__id=chat_id))
 
 
+@database_sync_to_async
 def get_json_from_message(message):
+    participant = Participant.objects.get(chat_participants__id=message.chat_id,
+                                          user__id=message.author_id)
+
+    dog = Dog.objects.select_related('account')\
+        .get(id=participant.dog.id, account_id=message.author_id)
+
     return {
         'chat_id': message.chat.id,
-        'author_id': message.author_id,
+        'author': {
+            "id": dog.account.id,
+            "name": dog.owner
+        },
         'message': message.message,
         'state': message.state,
         'date_created': str(message.date_created)

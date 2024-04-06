@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from api.models import Message, Chat, Participant
+from api.models import Message, Chat, Participant, NameChat
 
 
 @admin.register(Participant)
@@ -12,6 +12,11 @@ class ParticipantAdmin(admin.ModelAdmin):
 class ChatAdmin(admin.ModelAdmin):
     list_display = ['id', 'date_created', 'date_edited', 'date_deleted']
     readonly_fields = ['date_created']
+
+
+@admin.register(NameChat)
+class NameChatAdmin(admin.ModelAdmin):
+    list_display = ['id', 'participant', 'chat_name']
 
 
 @admin.register(Message)

@@ -14,6 +14,7 @@ router.register('subscription', views_api.SubscriptionView, basename='subscripti
 router.register('breeds', views_api.UploadFileView, basename='file upload')
 router.register('walks', views_api.WalkView, basename='walks')
 router.register('coords', views_api.CoordinateView, basename='coords')
+router.register('chats', views_api.ChatView, basename='chats')
 
 additional_urlpatterns = [
     path('account/authenticate', views_api.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),

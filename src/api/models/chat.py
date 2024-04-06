@@ -34,6 +34,22 @@ class Chat(models.Model):
         verbose_name_plural = 'Чаты'
 
 
+class NameChat(models.Model):
+    chat = models.ForeignKey(Chat, null=True, on_delete=models.SET_NULL, related_name='chat_with_name',
+                             verbose_name='Чат')
+    participant = models.ForeignKey(Participant, null=True, on_delete=models.SET_NULL,
+                                    related_name='name_chat_participant', verbose_name='Участник')
+    chat_name = models.CharField(max_length=128, verbose_name='Имя чата')
+
+    def __str__(self):
+        return f'{self.participant} - {self.chat_name}'
+
+    class Meta:
+        db_table = 'name_chat'
+        verbose_name = 'Имя чата'
+        verbose_name_plural = 'Имена чатов'
+
+
 class Message(models.Model):
     class Type(models.TextChoices):
         SENT = 'SENT', _('SENT')
