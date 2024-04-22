@@ -15,7 +15,8 @@ services:
       - ./persistentdata/static:/var/www/static
       - ./persistentdata/media:/var/www/media
     depends_on:
-      - web
+      web:
+        condition: service_healthy
 
   web:
     build:
@@ -32,6 +33,11 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: "curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' http://127.0.0.1:8000/"
+      interval: 5s
+      timeout: 10s
+      retries: 5
 
   redis:
     image: redis
