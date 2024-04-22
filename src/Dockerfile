@@ -15,4 +15,7 @@ COPY . ./src
 
 WORKDIR /app/src
 
-CMD daphne -b 0.0.0.0 -p 8000 Awooo.asgi:application
+CMD python manage.py collectstatic --no-input && \
+    python manage.py migrate --no-input && \
+    python manage.py createsuperuser --email "$DJANGO_SUPERUSER_EMAIL" --no-input || true && \
+    daphne -b 0.0.0.0 -p 8000 Awooo.asgi:application
