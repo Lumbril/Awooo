@@ -2,7 +2,7 @@
 
 backup_dir="/backup"
 today=$(date +'%Y-%m-%d')
-time=$(date +'%Y-%m-%d-%H-%M')
+time=$(date +'%Y-%m-%d %H:%M')
 backup_file="$backup_dir/backup-$today.sql"
 backup_logfile="$backup_dir/logs.txt"
 
